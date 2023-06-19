@@ -1,5 +1,8 @@
 const fs = require("fs")
-const pathFile = __dirname + '/../images/'
+// Путь до папки с картинками
+const pathFile = __dirname + '/..'
+// папка в которую сохранять
+const directoryName = '/images/'
 function deleteFile(name) {
   fs.unlink(pathFile + name, (err) => {
     if(err) {
@@ -9,7 +12,7 @@ function deleteFile(name) {
 }
 
 function createFile(id, file) {
-  fs.writeFile(pathFile + id + file.name, file.data, (err) => {
+  fs.writeFile(pathFile + directoryName + id + file.name, file.data, (err) => {
     if(err) {
       console.log(err)
     }
@@ -34,8 +37,13 @@ class Controller {
       price,
       description
     }
-    createFile(newProduct.id, req.files.image)
-    newProduct.image = newProduct.id + req.files.image.name
+    if(req.files){
+      createFile(newProduct.id, req.files.image)
+      newProduct.image = "/src/uploads/" + newProduct.id + req.files.image.name
+    }else{
+      newProduct.image = ""
+    }
+    newProduct.image = directoryName + newProduct.id + req.files.image.name
     products.push(newProduct)
     changeProducts(products)
     res.json(newProduct)
@@ -54,7 +62,7 @@ class Controller {
       if(product.id === +id) {
         deleteFile(product.image)
         createFile(product.id, req.files.image)
-        product.image = product.id + req.files.image.name
+        product.image = directoryName + product.id + req.files.image.name
         product.title = title
         product.price = price
         product.description = description
