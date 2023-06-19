@@ -39,11 +39,10 @@ class Controller {
     }
     if(req.files){
       createFile(newProduct.id, req.files.image)
-      newProduct.image = "/src/uploads/" + newProduct.id + req.files.image.name
+      newProduct.image = directoryName + newProduct.id + req.files.image.name
     }else{
       newProduct.image = ""
     }
-    newProduct.image = directoryName + newProduct.id + req.files.image.name
     products.push(newProduct)
     changeProducts(products)
     res.json(newProduct)
@@ -60,9 +59,11 @@ class Controller {
     let currentProduct
     products = products.map(product => {
       if(product.id === +id) {
-        deleteFile(product.image)
-        createFile(product.id, req.files.image)
-        product.image = directoryName + product.id + req.files.image.name
+        if(product.image){
+          deleteFile(product.image)
+          createFile(product.id, req.files.image)
+          product.image = directoryName + product.id + req.files.image.name
+        }
         product.title = title
         product.price = price
         product.description = description
