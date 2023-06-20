@@ -3,9 +3,11 @@ const fs = require("fs")
 const pathFile = __dirname + '/..'
 // папка в которую сохранять
 const directoryName = '/images/'
+
 function deleteFile(name) {
+  if(!fs.existsSync(pathFile + name)) return
   fs.unlink(pathFile + name, (err) => {
-    if(err) {
+    if (err) {
       console.log(err)
     }
   })
@@ -13,18 +15,18 @@ function deleteFile(name) {
 
 function createFile(id, file) {
   fs.writeFile(pathFile + directoryName + id + file.name, file.data, (err) => {
-    if(err) {
+    if (err) {
       console.log(err)
     }
   })
 }
 
 function changeProducts(products) {
-  fs.writeFileSync(__dirname +'/products.json', JSON.stringify({ products }))
+  fs.writeFileSync(__dirname + '/products.json', JSON.stringify({ products }))
 }
 
 function getJsonProducts() {
-  return JSON.parse(fs.readFileSync(__dirname +'/products.json', {encoding: "utf-8"})).products
+  return JSON.parse(fs.readFileSync(__dirname + '/products.json', { encoding: "utf-8" })).products
 }
 
 class Controller {
@@ -37,10 +39,10 @@ class Controller {
       price,
       description
     }
-    if(req.files){
+    if (req.files) {
       createFile(newProduct.id, req.files.image)
       newProduct.image = directoryName + newProduct.id + req.files.image.name
-    }else{
+    } else {
       newProduct.image = ""
     }
     products.push(newProduct)
@@ -49,7 +51,7 @@ class Controller {
   }
 
   async getProducts(req, res) {
-    const products = fs.readFileSync(__dirname +'/products.json', {encoding: "utf-8"})
+    const products = fs.readFileSync(__dirname + '/products.json', { encoding: "utf-8" })
     res.json(products)
   }
 
@@ -58,8 +60,8 @@ class Controller {
     let products = getJsonProducts()
     let currentProduct
     products = products.map(product => {
-      if(product.id === +id) {
-        if(product.image){
+      if (product.id === +id) {
+        if (product.image) {
           deleteFile(product.image)
           createFile(product.id, req.files.image)
           product.image = directoryName + product.id + req.files.image.name
@@ -79,7 +81,7 @@ class Controller {
     const id = req.params.id
     let products = getJsonProducts()
     const currentProduct = products.find(product => product.id === +id)
-    if(currentProduct) {
+    if (currentProduct) {
       deleteFile(currentProduct.image)
       products = products.filter(product => product.id !== +id)
       changeProducts(products)
